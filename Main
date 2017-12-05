@@ -1,0 +1,69 @@
+package KhanBot.TesterBot;
+
+import net.dv8tion.jda.client.entities.Group;
+import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.PermissionException;
+import net.dv8tion.jda.core.exceptions.RateLimitedException;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
+
+import javax.security.auth.login.LoginException;
+
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+
+import java.util.List;
+import java.util.Random;
+
+public class App extends ListenerAdapter
+{
+	private boolean echoBoo = false;
+   public static void main(String[] args) throws LoginException,  IllegalArgumentException,  InterruptedException, RateLimitedException{
+      JDA jdaBot = new JDABuilder(AccountType.BOT).setToken("token").buildBlocking();
+      jdaBot.addEventListener(new App());
+      System.out.print("good");
+      
+   }
+   @Override
+   public void onMessageReceived(MessageReceivedEvent event){	   
+       //Event specific information
+       User author = event.getAuthor();    
+       Message message = event.getMessage();           
+       MessageChannel channel = event.getChannel();
+       if(echoBoo && !author.isBot() && !message.getContent().equals("!echo")) {
+     	  channel.sendMessage(message.getContent()).queue();
+       }
+       if(message.getContent().charAt(0) == '!' && !author.isBot()) {
+	      if(message.getContent().equals("!hello")) {
+	    	  channel.sendMessage("Hello, " + author.getAsMention()).queue();
+	      }
+	      else if(message.getContent().equals("!help")) {
+	    	  channel.sendMessage("!hello: says hello\n!random: gives a random number\n!spooky: spooky \n!khan subject: looks up subject on Khan Acadamy.").queue();
+	      }
+	      else if(message.getContent().equals("!random")) {
+	    		  Random rand = new Random();
+	    		  String random = "" + rand.nextInt();
+	    		  channel.sendMessage(random).queue();
+	    		  
+	      }
+	      else if(message.getContent().equals("!spooky")) {
+	    	  channel.sendMessage(":scream:").queue();
+	      }
+	      else if(message.getContent().substring(0, 5).equals("!khan")) {
+	    	  channel.sendMessage("https://www.khanacademy.org/search?referer=%2F&page_search_query=" + message.getContent().substring(6)).queue();
+	      }
+	      else if(message.getContent().equals("!echo")) {
+	    	  echo();
+	      }
+       }
+   }
+   private void echo() {
+	   if(echoBoo) {echoBoo = false;}
+	   else {echoBoo = true;}
+   }
+}
